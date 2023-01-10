@@ -110,7 +110,7 @@ class _InnerRichTextState extends State<InnerRichText> {
     } else if (widget.text is RichableHeading6) {
       return (widget.text as RichableHeading6).text;
     } else if (widget.text is RichableListItem) {
-      return (widget.text as RichableListItem).text;
+      return '• ${(widget.text as RichableListItem).text}';
     } else if (widget.text is RichableOrderedListItem) {
       return (widget.text as RichableOrderedListItem).text;
     } else {
