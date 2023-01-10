@@ -18,7 +18,6 @@ class InnerRichText extends StatefulWidget {
     this.headline6Style,
     this.paragraphStyle,
     this.listItemStyle,
-    this.orderedListItemStyle,
   }) : super(key: key);
 
   ///Text from RichText
@@ -61,11 +60,6 @@ class InnerRichText extends StatefulWidget {
   ///
   ///Otherwise, is `TextTheme.bodyText2`
   final TextStyle? listItemStyle;
-
-  ///Style for ordered list item
-  ///
-  ///Otherwise, is `TextTheme.bodyText2`
-  final TextStyle? orderedListItemStyle;
 
   ///Style for paragraph
   ///
@@ -133,9 +127,6 @@ class _InnerRichTextState extends State<InnerRichText> {
       return widget.headline6Style ?? Theme.of(context).textTheme.headline6;
     } else if (widget.text is RichableListItem) {
       return widget.listItemStyle ?? Theme.of(context).textTheme.bodyText2;
-    } else if (widget.text is RichableOrderedListItem) {
-      return widget.orderedListItemStyle ??
-          Theme.of(context).textTheme.bodyText2;
     } else {
       return widget.paragraphStyle ?? Theme.of(context).textTheme.bodyText2;
     }

@@ -21,6 +21,7 @@ class FlusmicRichText extends StatelessWidget {
     this.headline4Style,
     this.headline5Style,
     this.headline6Style,
+    this.listItemStyle,
     this.imageFit = BoxFit.cover,
     this.loadingWidget,
     this.paragraphStyle,
@@ -68,6 +69,11 @@ class FlusmicRichText extends StatelessWidget {
   ///Otherwise, is `TextTheme.headline6`
   final TextStyle? headline6Style;
 
+  ///Style for list item
+  ///
+  ///Otherwise, is `TextTheme.bodyText2`
+  final TextStyle? listItemStyle;
+
   ///Widget to show while loading an image
   final Widget? loadingWidget;
 
@@ -97,6 +103,7 @@ class FlusmicRichText extends StatelessWidget {
               headline5Style: headline5Style,
               headline6Style: headline6Style,
               paragraphStyle: paragraphStyle,
+              listItemStyle: listItemStyle,
             ),
             image: (value) => InnerRichImage(
               value,
