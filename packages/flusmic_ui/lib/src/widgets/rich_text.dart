@@ -157,8 +157,31 @@ class _InnerRichTextState extends State<InnerRichText> {
       );
     }
 
+    // Group TextSpans with the same style by merging the text
+    final mergedChildren = <TextSpan>[];
+    for (var i = 0; i < children.length; i++) {
+      if (i == 0) {
+        mergedChildren.add(children[i]);
+      } else {
+        final previousChild = mergedChildren.last;
+        final currentChild = children[i];
+        if (previousChild.style == currentChild.style) {
+          mergedChildren
+            ..removeLast()
+            ..add(
+              TextSpan(
+                text: '${previousChild.text}${currentChild.text}',
+                style: previousChild.style,
+              ),
+            );
+        } else {
+          mergedChildren.add(currentChild);
+        }
+      }
+    }
+
     return TextSpan(
-      children: children,
+      children: mergedChildren,
     );
   }
 
