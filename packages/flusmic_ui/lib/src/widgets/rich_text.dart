@@ -129,7 +129,6 @@ class _InnerRichTextState extends State<InnerRichText> {
   }
 
   TextStyle? _getSpanStyle(List<String>? types) {
-    // TODO: take care of global style (defined in constructor)
     if (types == null) return null;
     return TextStyle(
       fontStyle: types.contains('em') ? FontStyle.italic : FontStyle.normal,
