@@ -83,32 +83,53 @@ class _InnerRichTextState extends State<InnerRichText> {
     );
   }
 
+  TextSpan _generateTextSpan(RichableParagraph paragraph) {
+    final spans = paragraph.spans;
+    final text = paragraph.text;
+    final children = <TextSpan>[];
+    var lastEnd = 0;
+    for (final span in spans) {
+      if (span.start > lastEnd) {
+        children.add(TextSpan(text: text.substring(lastEnd, span.start)));
+      }
+      final style = TextStyle(
+        fontWeight: span.type == 'strong' ? FontWeight.bold : null,
+        fontStyle: span.type == 'em' ? FontStyle.italic : null,
+      );
+      children.add(
+          TextSpan(text: text.substring(span.start, span.end), style: style));
+      lastEnd = span.end;
+    }
+    if (lastEnd < text.length) {
+      children.add(TextSpan(text: text.substring(lastEnd)));
+    }
+    return TextSpan(children: children);
+  }
+
   List<TextSpan> get _spans => [
         TextSpan(
           style: _styleByType,
-          text: _textByType,
+          children: [_textByType],
         ),
       ];
 
-  String get _textByType {
+  TextSpan get _textByType {
     if (widget.text is RichableHeading1) {
-      return (widget.text as RichableHeading1).text;
+      return TextSpan(text: (widget.text as RichableHeading1).text);
     } else if (widget.text is RichableHeading2) {
-      return (widget.text as RichableHeading2).text;
+      return TextSpan(text: (widget.text as RichableHeading2).text);
     } else if (widget.text is RichableHeading3) {
-      return (widget.text as RichableHeading3).text;
+      return TextSpan(text: (widget.text as RichableHeading3).text);
     } else if (widget.text is RichableHeading4) {
-      return (widget.text as RichableHeading4).text;
+      return TextSpan(text: (widget.text as RichableHeading4).text);
     } else if (widget.text is RichableHeading5) {
-      return (widget.text as RichableHeading5).text;
+      return TextSpan(text: (widget.text as RichableHeading5).text);
     } else if (widget.text is RichableHeading6) {
-      return (widget.text as RichableHeading6).text;
+      return TextSpan(text: (widget.text as RichableHeading6).text);
     } else if (widget.text is RichableListItem) {
-      return '• ${(widget.text as RichableListItem).text}';
-    } else if (widget.text is RichableOrderedListItem) {
-      return (widget.text as RichableOrderedListItem).text;
+      return TextSpan(text: '• ${(widget.text as RichableListItem).text}');
     } else {
-      return (widget.text as RichableParagraph).text;
+      return _generateTextSpan(widget.text as RichableParagraph);
     }
   }
 
