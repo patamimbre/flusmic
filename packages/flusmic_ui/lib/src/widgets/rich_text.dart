@@ -76,56 +76,9 @@ class _InnerRichTextState extends State<InnerRichText> {
     return Padding(
       padding: EdgeInsets.only(bottom: widget.bottomSeparation),
       child: RichText(
-        text: TextSpan(
-          children: _spans,
-        ),
+        text: _span,
       ),
     );
-  }
-
-  List<Span> getFormattedSpans(List<Span> spans, int textLength) {
-    // Create a list of formatted spans with the initial span being an empty
-    // span covering the entire text length
-    var formattedSpans = [Span(start: 0, end: textLength, type: '')];
-
-    // Iterate through the input spans and split the existing formatted spans
-    // as necessary to insert the new span
-    for (final span in spans) {
-      for (var i = 0; i < formattedSpans.length; i++) {
-        if (span.start >= formattedSpans[i].start &&
-            span.start < formattedSpans[i].end) {
-          formattedSpans.insert(
-            i + 1,
-            Span(start: span.start, end: span.end, type: span.type),
-          );
-          formattedSpans[i] = Span(
-            start: formattedSpans[i].start,
-            end: span.start,
-            type: formattedSpans[i].type,
-          );
-
-          // Increment i
-          i++;
-
-          if (span.end < formattedSpans[i].end) {
-            formattedSpans.insert(
-              i + 1,
-              Span(
-                start: span.end,
-                end: formattedSpans[i].end,
-                type: formattedSpans[i].type,
-              ),
-            );
-          }
-          formattedSpans[i] = Span(
-            start: span.start,
-            end: span.end,
-            type: '${formattedSpans[i].type} ${span.type}',
-          );
-        }
-      }
-    }
-    return formattedSpans;
   }
 
   TextStyle? _getSpanStyle(List<String>? types) {
@@ -137,18 +90,21 @@ class _InnerRichTextState extends State<InnerRichText> {
     );
   }
 
-  TextSpan _generateTextSpan(RichableParagraph paragraph) {
+  TextSpan get _span {
+    final richable = widget.text as RichableParagraph;
+    final text = richable.text;
+    final spans = richable.spans;
     final children = <TextSpan>[];
 
     // iterate over each character in the text with index
-    for (var i = 0; i < paragraph.text.length; i++) {
+    for (var i = 0; i < text.length; i++) {
       // get the spans that contain the current character
       final spansContainingChar =
-          paragraph.spans.where((span) => span.start <= i && span.end > i);
+          spans.where((span) => span.start <= i && span.end > i);
 
       children.add(
         TextSpan(
-          text: paragraph.text[i],
+          text: text[i],
           style: _getSpanStyle(
             spansContainingChar.map((span) => span.type).toList(),
           ),
@@ -180,54 +136,30 @@ class _InnerRichTextState extends State<InnerRichText> {
     }
 
     return TextSpan(
+      style: _styleByType,
       children: mergedChildren,
     );
   }
 
-  List<TextSpan> get _spans => [
-        TextSpan(
-          style: _styleByType,
-          children: [_textByType],
-        ),
-      ];
-
-  TextSpan get _textByType {
-    if (widget.text is RichableHeading1) {
-      return TextSpan(text: (widget.text as RichableHeading1).text);
-    } else if (widget.text is RichableHeading2) {
-      return TextSpan(text: (widget.text as RichableHeading2).text);
-    } else if (widget.text is RichableHeading3) {
-      return TextSpan(text: (widget.text as RichableHeading3).text);
-    } else if (widget.text is RichableHeading4) {
-      return TextSpan(text: (widget.text as RichableHeading4).text);
-    } else if (widget.text is RichableHeading5) {
-      return TextSpan(text: (widget.text as RichableHeading5).text);
-    } else if (widget.text is RichableHeading6) {
-      return TextSpan(text: (widget.text as RichableHeading6).text);
-    } else if (widget.text is RichableListItem) {
-      return TextSpan(text: '• ${(widget.text as RichableListItem).text}');
-    } else {
-      return _generateTextSpan(widget.text as RichableParagraph);
-    }
-  }
-
   TextStyle? get _styleByType {
-    if (widget.text is RichableHeading1) {
-      return widget.headline1Style ?? Theme.of(context).textTheme.headline1;
-    } else if (widget.text is RichableHeading2) {
-      return widget.headline2Style ?? Theme.of(context).textTheme.headline2;
-    } else if (widget.text is RichableHeading3) {
-      return widget.headline3Style ?? Theme.of(context).textTheme.headline3;
-    } else if (widget.text is RichableHeading4) {
-      return widget.headline4Style ?? Theme.of(context).textTheme.headline4;
-    } else if (widget.text is RichableHeading5) {
-      return widget.headline5Style ?? Theme.of(context).textTheme.headline5;
-    } else if (widget.text is RichableHeading6) {
-      return widget.headline6Style ?? Theme.of(context).textTheme.headline6;
-    } else if (widget.text is RichableListItem) {
-      return widget.listItemStyle ?? Theme.of(context).textTheme.bodyText2;
-    } else {
-      return widget.paragraphStyle ?? Theme.of(context).textTheme.bodyText2;
-    }
+    return widget.text.maybeMap(
+      heading1: (_) =>
+          widget.headline1Style ?? Theme.of(context).textTheme.headline1,
+      heading2: (_) =>
+          widget.headline2Style ?? Theme.of(context).textTheme.headline2,
+      heading3: (_) =>
+          widget.headline3Style ?? Theme.of(context).textTheme.headline3,
+      heading4: (_) =>
+          widget.headline4Style ?? Theme.of(context).textTheme.headline4,
+      heading5: (_) =>
+          widget.headline5Style ?? Theme.of(context).textTheme.headline5,
+      heading6: (_) =>
+          widget.headline6Style ?? Theme.of(context).textTheme.headline6,
+      paragraph: (_) =>
+          widget.paragraphStyle ?? Theme.of(context).textTheme.bodyText2,
+      listItem: (_) =>
+          widget.listItemStyle ?? Theme.of(context).textTheme.bodyText2,
+      orElse: () => null,
+    );
   }
 }

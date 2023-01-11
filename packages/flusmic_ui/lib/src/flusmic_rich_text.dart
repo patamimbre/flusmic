@@ -105,6 +105,11 @@ class FlusmicRichText extends StatelessWidget {
               paragraphStyle: paragraphStyle,
               listItemStyle: listItemStyle,
             ),
+            orderedListItem: (value) => Container(),
+            listItem: (value) => InnerRichText(
+              field,
+              listItemStyle: listItemStyle,
+            ),
             image: (value) => InnerRichImage(
               value,
               bottomSeparation: bottomSeparation,
@@ -113,11 +118,6 @@ class FlusmicRichText extends StatelessWidget {
               loadingWidget: loadingWidget,
             ),
             embed: (value) => Container(),
-            orderedListItem: (value) => Container(),
-            listItem: (value) => InnerRichText(
-              field,
-              listItemStyle: listItemStyle,
-            ),
           )
       ],
     );
