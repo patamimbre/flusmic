@@ -83,49 +83,83 @@ class _InnerRichTextState extends State<InnerRichText> {
     );
   }
 
-  TextSpan _generateTextSpan(RichableParagraph paragraph) {
-    final spans = paragraph.spans;
-    final text = paragraph.text;
-    List<TextSpan> children = [];
-    spans.sort((a, b) => a.start - b.start);
-    int lastEnd = 0;
-    for (Span span in spans) {
-      if (span.start > lastEnd) {
-        children.add(TextSpan(text: text.substring(lastEnd, span.start)));
-      }
-      TextStyle style = TextStyle();
-      if (span.type == 'strong') {
-        style = TextStyle(fontWeight: FontWeight.bold);
-      } else if (span.type == 'em') {
-        style = TextStyle(fontStyle: FontStyle.italic);
-      }
-      children.add(
-          TextSpan(text: text.substring(span.start, span.end), style: style));
-      lastEnd = span.end;
-    }
-    if (lastEnd < text.length) {
-      children.add(TextSpan(text: text.substring(lastEnd)));
-    }
-    return TextSpan(children: children);
+  List<Span> getFormattedSpans(List<Span> spans, int textLength) {
+    // Create a list of formatted spans with the initial span being an empty
+    // span covering the entire text length
+    var formattedSpans = [Span(start: 0, end: textLength, type: '')];
 
-    // final children = <TextSpan>[];
-    // var lastEnd = 0;
-    // for (final span in spans) {
-    //   if (span.start > lastEnd) {
-    //     children.add(TextSpan(text: text.substring(lastEnd, span.start)));
-    //   }
-    //   final style = TextStyle(
-    //     fontWeight: span.type == 'strong' ? FontWeight.bold : null,
-    //     fontStyle: span.type == 'em' ? FontStyle.italic : null,
-    //   );
-    //   children.add(
-    //       TextSpan(text: text.substring(span.start, span.end), style: style));
-    //   lastEnd = span.end;
-    // }
-    // if (lastEnd < text.length) {
-    //   children.add(TextSpan(text: text.substring(lastEnd)));
-    // }
-    // return TextSpan(children: children);
+    // Iterate through the input spans and split the existing formatted spans
+    // as necessary to insert the new span
+    for (final span in spans) {
+      for (var i = 0; i < formattedSpans.length; i++) {
+        if (span.start >= formattedSpans[i].start &&
+            span.start < formattedSpans[i].end) {
+          formattedSpans.insert(
+            i + 1,
+            Span(start: span.start, end: span.end, type: span.type),
+          );
+          formattedSpans[i] = Span(
+            start: formattedSpans[i].start,
+            end: span.start,
+            type: formattedSpans[i].type,
+          );
+
+          // Increment i
+          i++;
+
+          if (span.end < formattedSpans[i].end) {
+            formattedSpans.insert(
+              i + 1,
+              Span(
+                start: span.end,
+                end: formattedSpans[i].end,
+                type: formattedSpans[i].type,
+              ),
+            );
+          }
+          formattedSpans[i] = Span(
+            start: span.start,
+            end: span.end,
+            type: '${formattedSpans[i].type} ${span.type}',
+          );
+        }
+      }
+    }
+    return formattedSpans;
+  }
+
+  TextStyle? _getSpanStyle(List<String>? types) {
+    // TODO: take care of global style (defined in constructor)
+    if (types == null) return null;
+    return TextStyle(
+      fontStyle: types.contains('em') ? FontStyle.italic : FontStyle.normal,
+      fontWeight:
+          types.contains('strong') ? FontWeight.bold : FontWeight.normal,
+    );
+  }
+
+  TextSpan _generateTextSpan(RichableParagraph paragraph) {
+    final children = <TextSpan>[];
+
+    // iterate over each character in the text with index
+    for (var i = 0; i < paragraph.text.length; i++) {
+      // get the spans that contain the current character
+      final spansContainingChar =
+          paragraph.spans.where((span) => span.start <= i && span.end > i);
+
+      children.add(
+        TextSpan(
+          text: paragraph.text[i],
+          style: _getSpanStyle(
+            spansContainingChar.map((span) => span.type).toList(),
+          ),
+        ),
+      );
+    }
+
+    return TextSpan(
+      children: children,
+    );
   }
 
   List<TextSpan> get _spans => [
