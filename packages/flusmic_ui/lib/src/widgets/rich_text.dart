@@ -76,7 +76,7 @@ class _InnerRichTextState extends State<InnerRichText> {
     return Padding(
       padding: EdgeInsets.only(bottom: widget.bottomSeparation),
       child: RichText(
-        text: _span,
+        text: _spanByType,
       ),
     );
   }
@@ -138,6 +138,25 @@ class _InnerRichTextState extends State<InnerRichText> {
     return TextSpan(
       style: _styleByType,
       children: mergedChildren,
+    );
+  }
+
+  TextSpan get _spanByType {
+    return widget.text.maybeMap(
+      paragraph: (_) => _span,
+      listItem: (_) => _span,
+      orElse: () => TextSpan(
+        text: widget.text.maybeMap(
+          heading1: (value) => value.text,
+          heading2: (value) => value.text,
+          heading3: (value) => value.text,
+          heading4: (value) => value.text,
+          heading5: (value) => value.text,
+          heading6: (value) => value.text,
+          orElse: () => '',
+        ),
+        style: _styleByType,
+      ),
     );
   }
 
