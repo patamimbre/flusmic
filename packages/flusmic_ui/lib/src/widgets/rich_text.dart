@@ -152,7 +152,7 @@ class _InnerRichTextState extends State<InnerRichText> {
           heading4: (value) => value.text,
           heading5: (value) => value.text,
           heading6: (value) => value.text,
-          listItem: (value) => value.text,
+          listItem: (value) => '• ${value.text}',
           orElse: () => '',
         ),
         style: _styleByType,
