@@ -144,7 +144,6 @@ class _InnerRichTextState extends State<InnerRichText> {
   TextSpan get _spanByType {
     return widget.text.maybeMap(
       paragraph: (_) => _span,
-      listItem: (_) => _span,
       orElse: () => TextSpan(
         text: widget.text.maybeMap(
           heading1: (value) => value.text,
@@ -153,6 +152,7 @@ class _InnerRichTextState extends State<InnerRichText> {
           heading4: (value) => value.text,
           heading5: (value) => value.text,
           heading6: (value) => value.text,
+          listItem: (value) => value.text,
           orElse: () => '',
         ),
         style: _styleByType,
