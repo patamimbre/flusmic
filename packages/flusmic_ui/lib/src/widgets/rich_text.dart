@@ -86,16 +86,19 @@ class _InnerRichTextState extends State<InnerRichText> {
   TextSpan _generateTextSpan(RichableParagraph paragraph) {
     final spans = paragraph.spans;
     final text = paragraph.text;
-    final children = <TextSpan>[];
-    var lastEnd = 0;
-    for (final span in spans) {
+    List<TextSpan> children = [];
+    spans.sort((a, b) => a.start - b.start);
+    int lastEnd = 0;
+    for (Span span in spans) {
       if (span.start > lastEnd) {
         children.add(TextSpan(text: text.substring(lastEnd, span.start)));
       }
-      final style = TextStyle(
-        fontWeight: span.type == 'strong' ? FontWeight.bold : null,
-        fontStyle: span.type == 'em' ? FontStyle.italic : null,
-      );
+      TextStyle style = TextStyle();
+      if (span.type == 'strong') {
+        style = TextStyle(fontWeight: FontWeight.bold);
+      } else if (span.type == 'em') {
+        style = TextStyle(fontStyle: FontStyle.italic);
+      }
       children.add(
           TextSpan(text: text.substring(span.start, span.end), style: style));
       lastEnd = span.end;
@@ -104,6 +107,25 @@ class _InnerRichTextState extends State<InnerRichText> {
       children.add(TextSpan(text: text.substring(lastEnd)));
     }
     return TextSpan(children: children);
+
+    // final children = <TextSpan>[];
+    // var lastEnd = 0;
+    // for (final span in spans) {
+    //   if (span.start > lastEnd) {
+    //     children.add(TextSpan(text: text.substring(lastEnd, span.start)));
+    //   }
+    //   final style = TextStyle(
+    //     fontWeight: span.type == 'strong' ? FontWeight.bold : null,
+    //     fontStyle: span.type == 'em' ? FontStyle.italic : null,
+    //   );
+    //   children.add(
+    //       TextSpan(text: text.substring(span.start, span.end), style: style));
+    //   lastEnd = span.end;
+    // }
+    // if (lastEnd < text.length) {
+    //   children.add(TextSpan(text: text.substring(lastEnd)));
+    // }
+    // return TextSpan(children: children);
   }
 
   List<TextSpan> get _spans => [
